@@ -1,15 +1,40 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import javax.swing.*;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+public class Main {
+
+    public static void main(String[] args) {
+
+        FilaAtendimento<Object> filaAtendimento = new FilaAtendimento<Object>();
+        String[] menu = {"Solicitar nova senha","Excluir senha","Listar todas as senhas","Proxima senha","Chamar proxima senha","Sair"};
+        String[] prioridade = {"Comun","Prioridade"};
+        int numPac = 0;
+        int totPri = 0;
+
+        while (true){
+
+            int opcao = JOptionPane.showOptionDialog(null,"Menu de Atendimento","Menu de Atendimento",0,1,null,menu,menu[0]);
+
+        if(opcao == 0){
+            int opcao1 = JOptionPane.showOptionDialog(null,"Selecione a sua prioridade","Selecione o nivel de prioridade",0,1,null,prioridade,prioridade[0]);
+
+            if(opcao1 == 0){
+                Paciente paciente = new Paciente(numPac);
+                numPac++;
+                filaAtendimento.enfileirar(paciente);
+                JOptionPane.showMessageDialog(null,"Sua senha é : " + paciente.getSenha());
+            }else{
+                Paciente paciente = new Paciente(true,totPri);
+                filaAtendimento.adicionarPos(totPri,paciente);
+                totPri++;
+                JOptionPane.showMessageDialog(null,"Sua senha é : " + paciente.getSenha());
+            }
+        } else if (opcao == 1) {
+            for (int cont = 0; cont < filaAtendimento.getTamanho(); cont++) {
+
+            }
+        }
+
+
         }
     }
 }
