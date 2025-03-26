@@ -1,11 +1,14 @@
-public class FilaAtendimento<T> {
-    public T[] elementos;
+public class FilaAtendimento {
+    public Paciente[] elementos;
     public int tamanho;
+    public int contadorPrioritarios;
 
-    public FilaAtendimento(int cap){
-        this.elementos = (T[]) new Object[cap];
+    public FilaAtendimento(int capacidade) {
+        this.elementos = new Paciente[capacidade];
         this.tamanho = 0;
+        this.contadorPrioritarios = 0;
     }
+
 
     public FilaAtendimento(){
         this(10);
@@ -13,7 +16,7 @@ public class FilaAtendimento<T> {
 
     public void aumentaCap(){
         if(this.tamanho == this.elementos.length){
-            T[] elementosNovos = (T[]) new Object[this.elementos.length*2];
+            Paciente[] elementosNovos = new Paciente[this.elementos.length*2];
             for (int cont = 0; cont < this.elementos.length; cont++) {
                 elementosNovos[cont] = this.elementos[cont];
             }
@@ -21,29 +24,12 @@ public class FilaAtendimento<T> {
         }
     }
 
-    public boolean adicionarPos(int posicao, T elemento){
-        if(!(posicao >=0 && posicao < tamanho)){
-            throw new IllegalArgumentException("Posição Inválida");
-        }
-        this.aumentaCap();
-        for(int i=this.tamanho-1; i>=posicao; i--){
-            this.elementos[i+1] = this.elementos[i];
-        }
-        this.elementos[posicao] = elemento;
-        this.tamanho++;
 
-        return true;
+    public void enfileirar(Paciente paciente) {
+        aumentaCap();
+        elementos[tamanho++] = paciente;
     }
 
-    public boolean enfileirar(T elemento){
-        this.aumentaCap();
-        if(this.tamanho < this.elementos.length){
-            this.elementos[this.tamanho] = elemento;
-            this.tamanho++;
-            return true;
-        }
-        return false;
-    }
 
     public int getTamanho(){
         return this.tamanho;
@@ -51,57 +37,94 @@ public class FilaAtendimento<T> {
 
     @Override
     public String toString() {
+        if (estaVazia()) {
+            return "Fila vazia";
+        }
+
         StringBuilder s = new StringBuilder();
-        s.append("[");
-
-        for(int i=0; i<this.tamanho-1; i++){
-            s.append(this.elementos[i]);
-            s.append(", ");
+        for (int i = 0; i < tamanho; i++) {
+            s.append(elementos[i].getSenha())
+                    .append(elementos[i].isPrioridade() ? " (Prioritário)" : "")
+                    .append("\n");
         }
-
-        if(this.tamanho> 0){
-            s.append(this.elementos[this.tamanho-1]);
-        }
-
-        s.append("]");
-
         return s.toString();
     }
 
-    public void remove(int posicao ){
-        if(!(posicao >=0 && posicao < tamanho)){
-            throw new IllegalArgumentException("Posição Inválida");
-        }
-        for (int i=posicao; i<tamanho-1; i++){
-            elementos[i] = elementos[i+1];
-        }
-        tamanho --;
-    }
+    public int getContadorPrioritarios() {
+        return this.contadorPrioritarios;
+}
+
 
     public boolean estaVazia(){
         return this.tamanho == 0;
     }
 
-
-
-    public T espiar(){
-        if(this.estaVazia()){
+    public Paciente espiar() {
+        if (estaVazia()) {
             return null;
         }
-        return this.elementos[0];
+
+        // Prioriza não prioritários se já atendeu 3+ prioritários
+        if (contadorPrioritarios >= 3) {
+            for (int i = 0; i < tamanho; i++) {
+                if (!elementos[i].isPrioridade()) {
+                    return elementos[i];
+                }
+            }
+        }
+
+        // Busca por prioritários
+        for (int i = 0; i < tamanho; i++) {
+            if (elementos[i].isPrioridade()) {
+                return elementos[i];
+            }
+        }
+
+        // Retorna o primeiro da fila se não encontrar prioritários
+        return elementos[0];
     }
 
-    public T desenfileirar(){
-
-        if(this.estaVazia()){
+    public Paciente desenfileirar() {
+        Paciente proximo = espiar();
+        if (proximo == null) {
             return null;
         }
-        final int POS = 0;
 
-        T elementoASerRemovido = this.elementos[POS];
-        this.remove(POS);
-        return elementoASerRemovido;
+        int posicao = buscarPosicao(proximo);
+        if (posicao != -1) {
+            atualizarContador(proximo);
+            remove(posicao);
+        }
+
+        return proximo;
+
     }
+
+    private int buscarPosicao(Paciente paciente) {
+        for (int i = 0; i < tamanho; i++) {
+            if (elementos[i] == paciente) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
+    public void remove(int posicao) {
+            for (int i = posicao; i < tamanho - 1; i++) {
+                elementos[i] = elementos[i + 1];
+            }
+            elementos[--tamanho] = null;
+        }
+
+    private void atualizarContador(Paciente paciente) {
+        if (paciente.isPrioridade()) {
+            contadorPrioritarios++;
+        } else {
+            contadorPrioritarios = 0;
+        }
+    }
+
 
 
 

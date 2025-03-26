@@ -1,23 +1,21 @@
 public class Paciente {
-    boolean prioridade;
-    String senha;
+    private String senha;
+    private boolean prioridade;
 
-    public Paciente(boolean prioridade,int numPac){
+    public Paciente(boolean prioridade, int numPac) {
         this.prioridade = prioridade;
-        if(prioridade){
-            this.senha = "P-" + (numPac+1);
-        }else{
-            this.senha = "C-" + (numPac+1);
-        }
+        this.senha = (prioridade ? "P-" : "C-") + numPac;
     }
 
-    public Paciente(int numPac){
-        this.prioridade = false;
-        this.senha = "C-" + (numPac+1);
+    public Paciente(int numPac) {
+        this(false, numPac);
     }
 
-    public String getSenha(){
-        return this.senha;
+    public String getSenha() {
+        return senha;
     }
 
+    public boolean isPrioridade() {
+        return prioridade;
+}
 }
